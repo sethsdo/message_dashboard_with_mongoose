@@ -6,6 +6,9 @@ const path = require('path')
 const mongoose = require('mongoose');
 const moment = require('moment');
 const bodyParser = require('body-parser');
+const session = require('express-session');
+
+app.use(session({ secret: 'expresspasskey' }));
 
 mongoose.connect('mongodb://localhost/quotes_mongoose');
 var Schema = mongoose.Schema;
@@ -35,14 +38,17 @@ app.set('view engine', 'ejs');
 
 
 app.get('/', function (req, res) {
+    if (!req.session.errors) {
+        req.session.errors = [];
+    }
     Post.find({}, function (err, post) {
         if (err) {
             console.log("something wen't wrong!")
         }
         const context = {
             "posts": post,
+            "errors": req.session.errors
         }
-        console.log(context)
         res.render('index', context);
     });
 })
@@ -52,7 +58,8 @@ app.post('/post', function (req, res) {
     console.log(post);
     post.save(function (err) {
         if (err) {
-            res.render("index", { errors: post.errors })
+            req.session.errors = post.errors;
+            res.redirect("/")
         }
          else {
             res.redirect('/');
@@ -67,7 +74,11 @@ app.post('/comment/:id', function (req, res) {
         post.comments.push(comment);
         comment.save(function (err) {
             post.save(function (err) {
-                if (err) { console.log('Error'); }
+                if (err) { 
+                    console.log('Error');
+                    req.session.errors = comment.errors;
+                    res.redirect("/")
+                }
                 else { res.redirect('/'); }
             });
         });
