@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title></title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    </head>
+    <body>
+        <div class="container">
+            <h1>The Dojo Message Board</h1>
+            <hr>
+            <% if(typeof(errors) != 'undefined' ) { %>
+                <% for (var x in errors) { %>
+                    <h3>
+                        <%= errors[x].message %>
+                    </h3>
+                <% } %>
+            <% } %>
+            <div class="form-group col-xs-12">
+                <form action="/post" method="POST">
+                    <label for="usr">Name:</label>
+                    <input type="text" class="form-control" id="usr" name="name" style="width: 20%;">
+                    <label for="message">Message:</label>
+                    <textarea class="form-control" rows="4" id="message" name="message"></textarea>
+                    <button type="submit" class="btn btn-primary" style="float: right">Submit</button>
+                </form>
+            </div>
+            <% for (let post of posts) { %>
+                <div class="container">
+                    <h3><%= post.author %></h3>
+                    <p><%= post.text %></p>
+                    <hr>
+                    <div class="contianer">
+                        <% for (let comment of post.comments) { %>
+                            <h4><%= comment.author %></4>
+                            <p><%= comment.text %></p>
+                        <% } %>
+                        <div class="form-group col-xs-10" style="float: right">
+                            <form action="/comment/<%= post.id %>" method="post">
+                                <label for="usr">Name:</label>
+                                <input type="text" class="form-control" id="usr" name="name" style="width: 20%;">
+                                <label for="comment">Comment:</label>
+                                <textarea class="form-control" rows="3" id="comment" name="comment"></textarea>
+                                <button type="submit" class="btn btn-primary" style="float: right">Submit</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </body>
+</html>
